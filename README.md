@@ -2,6 +2,8 @@
 
 Next.js 15 (App Router) + Supabase + 토스페이먼츠(테스트) 로 만든 아두이노 부품 쇼핑몰입니다.
 
+**배포 주소:** https://arduino-shop-gamma.vercel.app
+
 ## 기능
 - 상품 목록 / 카테고리 / 검색 / 정렬 / 재고 필터, 상품 상세(사양표)
 - 장바구니 (localStorage 저장)
