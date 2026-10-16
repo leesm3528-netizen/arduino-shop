@@ -1,11 +1,11 @@
-# 📘 아두몰 만들기 — 단계별 학습 가이드
+# 아두몰 만들기 — 단계별 학습 가이드
 
 > 아두이노 쇼핑몰을 **기획 → 개발 → 배포**까지 하루 동안 진행한 과정을 정리한 문서입니다.
 > 각 단계마다 **무엇을 했는지 / 왜 그렇게 했는지 / 직접 해볼 것**을 담았어요.
 
 ---
 
-## 🗺️ 전체 흐름
+## 전체 흐름
 
 ```mermaid
 flowchart LR
@@ -38,8 +38,8 @@ flowchart LR
 코드를 쓰기 전에 **무엇을 만들지**부터 정했습니다.
 
 **누가 쓰나요?**
-- 👤 고객: 상품 보기, 장바구니, 결제, 리뷰
-- 🛠️ 관리자: 상품 등록, 재고·주문 관리
+- 고객: 상품 보기, 장바구니, 결제, 리뷰
+- 관리자: 상품 등록, 재고·주문 관리
 
 **기술 스택 선택 이유**
 
@@ -51,7 +51,7 @@ flowchart LR
 | 토스페이먼츠 | 국내 결제, 공개 테스트 키 제공 |
 | Vercel | GitHub 저장소만 있으면 클릭 몇 번으로 배포 |
 
-> ✏️ **직접 해보기:** 내가 만들고 싶은 쇼핑몰의 "고객 기능 5개, 관리자 기능 3개"를 적어보세요.
+> **직접 해보기:** 내가 만들고 싶은 쇼핑몰의 "고객 기능 5개, 관리자 기능 3개"를 적어보세요.
 
 ---
 
@@ -89,7 +89,7 @@ npm install @supabase/ssr @supabase/supabase-js zustand @tosspayments/tosspaymen
 
 ## 4단계. 데이터베이스 설계
 
-📄 파일: `supabase/migrations/0001_init.sql`
+파일: `supabase/migrations/0001_init.sql`
 
 ### 테이블 관계
 
@@ -112,7 +112,7 @@ erDiagram
 | `order_items` | 주문 당시 상품명·가격·수량 (가격이 바뀌어도 기록 유지) |
 | `reviews` | 별점, 내용 |
 
-### 🔐 RLS (Row Level Security) — 가장 중요한 개념!
+### RLS (Row Level Security) — 가장 중요한 개념!
 
 Supabase는 브라우저가 DB에 **직접** 접근합니다. 그래서 "누가 어떤 행을 볼 수 있는지"를 DB에 규칙으로 정해 둡니다.
 
@@ -129,7 +129,7 @@ create policy "orders_select" on public.orders for select to authenticated
 | 리뷰 | 누구나 | 구매한 사람만 |
 | 프로필 | 본인 + 관리자 | 본인 (단, `role` 컬럼은 불가) |
 
-> ⚠️ **RLS를 켜지 않으면** 누구나 모든 데이터를 읽고 지울 수 있어요!
+> **RLS를 켜지 않으면** 누구나 모든 데이터를 읽고 지울 수 있어요!
 
 ---
 
@@ -163,7 +163,7 @@ sequenceDiagram
 | `confirm-payment` | Edge Function | 금액 검증 → 토스 승인 → 결제완료 처리 |
 | `mark_order_paid` | DB 함수 | Edge Function만 호출 가능 (일반 사용자 차단) |
 
-> 💡 **왜 Edge Function인가요?** 토스 **시크릿 키**와 Supabase **서비스 키**는 브라우저에 절대 노출되면 안 됩니다. Edge Function은 Supabase 서버에서 실행되므로 안전하게 보관할 수 있어요.
+> **왜 Edge Function인가요?** 토스 **시크릿 키**와 Supabase **서비스 키**는 브라우저에 절대 노출되면 안 됩니다. Edge Function은 Supabase 서버에서 실행되므로 안전하게 보관할 수 있어요.
 
 ---
 
@@ -177,7 +177,7 @@ sequenceDiagram
 node supabase/seed/build-seed.mjs   # products.json → seed.sql
 ```
 
-> 💡 데이터(JSON)와 SQL을 분리하면, 상품을 추가할 때 JSON만 고치면 됩니다.
+> 데이터(JSON)와 SQL을 분리하면, 상품을 추가할 때 JSON만 고치면 됩니다.
 
 ### 이미지 — 저작권 지키기
 - 도형/그림 대신 **실제 사진** 사용
@@ -229,7 +229,7 @@ git commit -m "Arduino shop 첫 커밋"
 gh repo create arduino-shop --private --source=. --remote=origin --push
 ```
 
-> ⚠️ **올리면 안 되는 파일:** `.env.local`(비밀 키), `node_modules`, `.vercel`
+> **올리면 안 되는 파일:** `.env.local`(비밀 키), `node_modules`, `.vercel`
 > → `.gitignore`에 등록되어 있는지 커밋 전에 꼭 확인하세요. (`git status`로 확인)
 
 ---
@@ -262,13 +262,13 @@ vercel deploy --prod
 
 | 환경변수 | 공개해도 되나요? |
 |---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | ✅ (브라우저에 노출되는 값) |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` (publishable) | ✅ RLS가 보호 |
-| `NEXT_PUBLIC_TOSS_CLIENT_KEY` | ✅ 클라이언트 키 |
-| Supabase **secret / service_role** 키 | ❌ 절대 금지 |
-| 토스 **시크릿** 키 | ❌ Edge Function에만 |
+| `NEXT_PUBLIC_SUPABASE_URL` | 가능 (브라우저에 노출되는 값) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` (publishable) | 가능 (RLS가 보호) |
+| `NEXT_PUBLIC_TOSS_CLIENT_KEY` | 가능 (클라이언트 키) |
+| Supabase **secret / service_role** 키 | **불가** (절대 금지) |
+| 토스 **시크릿** 키 | **불가** (Edge Function에만) |
 
-> 💡 `NEXT_PUBLIC_` 접두사가 붙은 변수만 브라우저 코드에 포함됩니다.
+> `NEXT_PUBLIC_` 접두사가 붙은 변수만 브라우저 코드에 포함됩니다.
 
 ---
 
@@ -278,19 +278,19 @@ vercel deploy --prod
 
 | 테스트 | 기대 결과 | 결과 |
 |---|---|---|
-| 로그인 | 성공 | ✅ |
-| 주문 생성 금액 | 서버 계산값과 일치 (36,080원) | ✅ |
-| 결제 금액 조작 | "결제 금액이 주문 금액과 다릅니다" | ✅ 차단 |
-| 가짜 결제키 승인 | 토스가 거절, 주문은 결제대기 유지 | ✅ 차단 |
-| 스스로 관리자 승격 | 권한 없음 | ✅ 차단 |
-| 결제 없이 결제완료 처리 | 권한 없음 | ✅ 차단 |
-| 주요 페이지 접속 | HTTP 200 | ✅ |
+| 로그인 | 성공 | 통과 |
+| 주문 생성 금액 | 서버 계산값과 일치 (36,080원) | 통과 |
+| 결제 금액 조작 | "결제 금액이 주문 금액과 다릅니다" | 통과 (차단됨) |
+| 가짜 결제키 승인 | 토스가 거절, 주문은 결제대기 유지 | 통과 (차단됨) |
+| 스스로 관리자 승격 | 권한 없음 | 통과 (차단됨) |
+| 결제 없이 결제완료 처리 | 권한 없음 | 통과 (차단됨) |
+| 주요 페이지 접속 | HTTP 200 | 통과 |
 
-> ✏️ **직접 해보기:** 배포 사이트에서 회원가입 → 장바구니 → 테스트 결제 → 마이페이지 주문 확인까지 진행해 보세요.
+> **직접 해보기:** 배포 사이트에서 회원가입 → 장바구니 → 테스트 결제 → 마이페이지 주문 확인까지 진행해 보세요.
 
 ---
 
-## 🧯 트러블슈팅 — 오늘 실제로 겪은 문제들
+## 트러블슈팅 — 오늘 실제로 겪은 문제들
 
 | 문제 | 원인 | 해결 |
 |---|---|---|
@@ -304,23 +304,23 @@ vercel deploy --prod
 
 ---
 
-## 🎯 연습 과제
+## 연습 과제
 
-**🟢 기초**
+**기초**
 1. 새 카테고리 "도서"를 추가하고 상품 1개를 등록해 보세요. (관리자 페이지 이용)
 2. 메인 배너 문구를 바꿔 보세요. (`src/app/page.tsx`)
 
-**🟡 중급**
+**중급**
 3. 상품 목록에 "리뷰 많은 순" 정렬을 추가해 보세요.
 4. 5만 원 미만 주문에 배송비 3,000원을 붙여 보세요. (힌트: `create_order` 함수도 수정해야 금액 조작을 막을 수 있어요!)
 
-**🔴 심화**
+**심화**
 5. 결제 취소 기능을 만들어 보세요. (토스 결제 취소 API + 재고 복구)
 6. 장바구니를 DB에 저장해 다른 기기에서도 보이게 해 보세요. (`cart_items` 테이블 + RLS)
 
 ---
 
-## 📎 참고 링크
+## 참고 링크
 - Next.js App Router: https://nextjs.org/docs/app
 - Supabase RLS: https://supabase.com/docs/guides/database/postgres/row-level-security
 - Supabase Edge Functions: https://supabase.com/docs/guides/functions
